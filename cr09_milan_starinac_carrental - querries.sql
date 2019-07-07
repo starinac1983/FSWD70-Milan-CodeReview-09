@@ -1,10 +1,12 @@
-1. Show customers, days of car rental, car brand and type, price per day, total price of car rental, ordered by customer last name
+1. Show customers, days of car rental, car brand and type, location for pick and left the car, price per day, total price of car rental, ordered by customer last name
 
-SELECT customer.lastName, customer.firstName, car.brand, car.type, invoice.daysRent, car.pricePerDay, (invoice.daysRent * car.pricePerDay) as Total_Price_EUR
+SELECT customer.lastName, customer.firstName, car.brand, car.type, locationpick.locPickAddress, locationpick.locPickCity, locationleft.locLeftAddress, locationleft.locLeftCity, invoice.daysRent, car.pricePerDay, (invoice.daysRent * car.pricePerDay) as Total_Price_EUR
 FROM
 customer
 INNER JOIN invoice ON invoice.FK_customer= customer.customerID
 INNER JOIN car ON invoice.FK_car= car.carID
+INNER JOIN locationpick ON invoice.FK_locationPick= locationpick.locationPickID
+INNER JOIN locationleft ON invoice.FK_locationLeft= locationleft.locationLeftID
 ORDER BY `customer`.`lastName` ASC
 ____________________________________________
 2.Show customers, day of car rental, insurance package, insurance price per day, total price of insurance, ordered by customer last name
@@ -57,3 +59,18 @@ INNER JOIN invoiceadd ON invoiceadd.FK_customer = customer.customerID
 INNER JOIN extracharges ON invoiceadd.FK_extraCharges = extracharges.extraChargeID
 ORDER BY `customer`.`lastName` ASC
 ___________________________________________
+6. All customers who have rent the car and have some extra charge / penalty to pay and total amount for paying
+
+
+SELECT customer.lastName, customer.firstName, customer.address, customer.city, invoice.creditCardNo, invoice.invoiceID, invoiceadd.invoiceAddID, invoiceadd.creditCardNo,
+ ( ((invoice.daysRent*car.pricePerDay)+(invoice.daysRent*insurance.insPricePerDay)+(invoice.daysRent*addservices.addPricePerDay)) + extracharges.extraChargePrice ) AS Total_Price_EUR
+FROM
+customer
+INNER JOIN invoice ON invoice.FK_customer = customer.customerID
+INNER JOIN invoiceadd ON invoiceadd.FK_customer = customer.customerID
+INNER JOIN car ON invoice.FK_car= car.carID
+INNER JOIN insurance ON invoice.FK_insurance = insurance.insuranceID
+INNER JOIN addservices ON invoice.FK_addServices = addservices.addServicesID
+INNER JOIN extracharges ON invoiceadd.FK_extraCharges = extracharges.extraChargeID
+ORDER BY `customer`.`lastName` ASC
+
